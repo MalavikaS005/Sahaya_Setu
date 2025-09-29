@@ -129,8 +129,77 @@ class ReportViewModel : ViewModel() {
                 departmentHeadName = "Ms. Rekha Iyer",
                 workerName = "Ajith",
                 workerPhone = "9900112233"
+            ),
+            Report(
+                id = 26,
+                title = "Potholes on Anna Salai Causing Traffic Delays",
+                status = "Active",
+                category = "Road Maintenance",
+                upvotes = 23,
+                description = "Multiple large potholes near Spencer Plaza junction are causing severe traffic congestion and vehicle damage. Urgent repair needed as monsoon season approaches.",
+                location = "Anna Salai, Chennai",
+                latitude = 13.0643,
+                longitude = 80.2565,
+                imageUrl = "https://example.com/pothole_anna_salai.jpg",
+                audioUrl = "https://example.com/pothole_complaint_audio.mp3",
+                timestamp = "2025-09-20T08:30:00",
+                departmentHeadName = "Mr. Kumar Rajan",
+                workerName = "Ravi",
+                workerPhone = "9876543210"
+            ),
+            Report(
+                id = 29,
+                title = "Water Logging in Velachery During Heavy Rains",
+                status = "Active",
+                category = "Drainage",
+                upvotes = 31,
+                description = "Persistent water logging in Velachery main road after every heavy rainfall. Residents unable to commute safely. Storm water drains need immediate cleaning.",
+                location = "Velachery, Chennai",
+                latitude = 12.9756,
+                longitude = 80.2207,
+                imageUrl = "https://example.com/velachery_flooding.jpg",
+                audioUrl = "https://example.com/waterlogging_report.mp3",
+                timestamp = "2025-09-18T16:00:00",
+                departmentHeadName = "Mr. Ashok Kumar",
+                workerName = "Karthik",
+                workerPhone = "9445566778"
+            ),
+            Report(
+                id = 31,
+                title = "Stray Dogs Increasing in Adyar Residential Area",
+                status = "Active",
+                category = "Animal Control",
+                upvotes = 15,
+                description = "Growing population of stray dogs in Adyar residential streets. Several incidents of chasing children and elderly. Need animal birth control program urgently.",
+                location = "Adyar, Chennai",
+                latitude = 13.0067,
+                longitude = 80.2206,
+                imageUrl = "https://example.com/stray_dogs_adyar.jpg",
+                audioUrl = "https://example.com/dog_problem_audio.mp3",
+                timestamp = "2025-09-17T07:15:00",
+                departmentHeadName = "Dr. Ramesh Babu",
+                workerName = "Suresh",
+                workerPhone = "9334455667"
+            ),
+            Report(
+                id = 33,
+                title = "Illegal Dumping of Construction Waste in Sholinganallur",
+                status = "Active",
+                category = "Environment",
+                upvotes = 27,
+                description = "Large amounts of construction debris being dumped illegally in Sholinganallur lake area. Environmental hazard affecting local groundwater and bird population.",
+                location = "Sholinganallur, Chennai",
+                latitude = 12.9010,
+                longitude = 80.2279,
+                imageUrl = "https://example.com/illegal_dumping.jpg",
+                audioUrl = "https://example.com/dumping_complaint.mp3",
+                timestamp = "2025-09-16T11:20:00",
+                departmentHeadName = "Ms. Kavitha Devi",
+                workerName = "Arjun",
+                workerPhone = "9112233445"
+            ),
+
             )
-        )
     )
 
     val reports: StateFlow<List<Report>> = _reports

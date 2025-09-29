@@ -5,25 +5,35 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+
 import androidx.compose.ui.draw.clip
 import android.content.Intent
 import android.net.Uri
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.google.ai.client.generativeai.Chat
 import com.sid.civilq_1.model.Report
 import com.sid.civilq_1.viewmodel.ReportViewModel
-import com.sid.civilq_1.components.getUserLocation  // <-- import your location function
+import com.sid.civilq_1.components.getUserLocation
 
 val ActiveColor = Color(0xFF4A90E2) // Blue for Active
 val SolvedColor = Color(0xFF50E3C2)  // Green for Solved
@@ -51,88 +61,126 @@ fun HomeScreen(
         }
     }
 
-    // 🔹 State to track selected tab: "Active" or "Solved"
+    // State to track selected tab: "Active" or "Solved"
     var selectedTab by remember { mutableStateOf("Active") }
 
-    // 🔹 Filtered reports based on selected tab
+    // Filtered reports based on selected tab
     val filteredReports = nearbyReports.filter { it.status == selectedTab }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFFF0F0F0))
-            .padding(16.dp)
-            .verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-
-        // 🟢 Location text (left-aligned below top bar)
-        Text(
-            text = "📍 $mainAddress",
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Medium,
-            color = Color.DarkGray,
+    // Main container with Box to allow floating button
+    Box() {
+        Column(
             modifier = Modifier
-                .align(Alignment.Start)
-                .padding(top = 1.dp, bottom = 2.dp)
-        )
-        Text(
-            text = exactAddress,
-            fontSize = 12.sp,
-            color = Color.Gray,
-            modifier = Modifier
-                .align(Alignment.Start)
-                .padding(bottom = 16.dp)
-        )
+                .fillMaxSize()
+                .background(Color(0xFFF0F0F0))
+                .padding(top=0.dp, start = 16.dp, end = 16.dp)
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
 
-        // 🟢 Emergency button below location
-        EmergencyContactButton()
+            // Location text (left-aligned below top bar)
+            Text(
+                text = "Hello, Active Citizen! 👋",
+                fontSize = 34.sp,
+                fontWeight = FontWeight.W800,
+                color = Color.DarkGray,
+                modifier = Modifier
+                    .align(Alignment.Start)
+                    .padding(top = 55.dp, bottom = 2.dp)
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+            Text(
+                text = "📍 $mainAddress",
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium,
+                color = Color.DarkGray,
+                modifier = Modifier
+                    .align(Alignment.Start)
+                    .padding(top = 1.dp, bottom = 2.dp)
+            )
+            Text(
+                text = exactAddress,
+                fontSize = 12.sp,
+                color = Color.Gray,
+                modifier = Modifier
+                    .align(Alignment.Start)
+                    .padding(bottom = 16.dp)
+            )
 
-        Spacer(modifier = Modifier.height(24.dp))
+            // Emergency button below location
+            EmergencyContactButton()
 
-        // Stats row
-        ReportStatsRow(
-            active = nearbyReports.count { it.status == "Active" },
-            solved = nearbyReports.count { it.status == "Solved" }
-        )
+            Spacer(modifier = Modifier.height(24.dp))
 
-        Spacer(modifier = Modifier.height(16.dp))
+            // Stats row
+            ReportStatsRow(
+                active = nearbyReports.count { it.status == "Active" },
+                solved = nearbyReports.count { it.status == "Solved" }
+            )
 
-        // 🔹 Pill-shaped segmented control
-        SegmentedTab(
-            tabs = listOf("Active", "Solved"),
-            selectedTab = selectedTab,
-            onTabSelected = { selectedTab = it }
-        )
+            Spacer(modifier = Modifier.height(16.dp))
 
-        Spacer(modifier = Modifier.height(16.dp))
+            // Pill-shaped segmented control
+            SegmentedTab(
+                tabs = listOf("Active", "Solved"),
+                selectedTab = selectedTab,
+                onTabSelected = { selectedTab = it }
+            )
 
-        Text(
-            text = "$selectedTab Reports in Nearby Areas",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 8.dp)
-        )
+            Spacer(modifier = Modifier.height(16.dp))
 
-        // Reports List
-        // Reports List
-        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            filteredReports.sortedByDescending { it.upvotes }.forEach { report ->
-                ReportItemCard(
-                    report = report,
-                    onUpvote = { reportViewModel.upvoteReport(report.id) },
-                    onClick = { navController.navigate("reportdetails/${report.id}") },
-                    showUpvote = (selectedTab == "Active") // Only show thumbs up in Active tab
-                )
+            Text(
+                text = "$selectedTab Reports in Nearby Areas",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp)
+            )
+
+            // Reports List
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                filteredReports.sortedByDescending { it.upvotes }.forEach { report ->
+                    ReportItemCard(
+                        report = report,
+                        onUpvote = { reportViewModel.upvoteReport(report.id) },
+                        onClick = { navController.navigate("reportdetails/${report.id}") },
+                        showUpvote = (selectedTab == "Active")
+                    )
+                }
             }
+
+            // Add bottom padding to prevent content from being hidden behind FAB
+            Spacer(modifier = Modifier.height(80.dp))
         }
 
+        // Floating Chat Button at bottom left
+        FloatingActionButton(
+            onClick = {
+                navController.navigate("chat")
+            },
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .padding(start=10.dp,bottom = 100.dp)
+                .size(56.dp),
+            containerColor = Color(0xFF6200EE),
+            contentColor = Color.White,
+            shape = RoundedCornerShape(46.dp),
+            elevation = FloatingActionButtonDefaults.elevation(
+                defaultElevation = 8.dp,
+                pressedElevation = 12.dp
+            )
+        ) {
+            Icon(
+                painter = painterResource(id = com.sid.civilq_1.R.drawable.chatbot), // Replace with your chat icon
+                contentDescription = "Open Chat Assistant",
+                modifier = Modifier.size(24.dp)
+            )
+        }
     }
 }
 
-// 🔹 Segmented Tab Composable
+// Segmented Tab Composable
 @Composable
 fun SegmentedTab(
     tabs: List<String>,
@@ -169,13 +217,10 @@ fun SegmentedTab(
     }
 }
 
-// ========================
-// Everything below this remains unchanged
-// ========================
 @Composable
 fun EmergencyContactButton() {
     val context = LocalContext.current
-    val emergencyNumber = "112" // Replace with your emergency number
+    val emergencyNumber = "112"
 
     Button(
         onClick = {
@@ -189,6 +234,7 @@ fun EmergencyContactButton() {
         modifier = Modifier
             .fillMaxWidth()
             .height(80.dp)
+            .shadow(6.dp, RoundedCornerShape(52.dp))
     ) {
         Text(
             text = "Emergency Contacts",

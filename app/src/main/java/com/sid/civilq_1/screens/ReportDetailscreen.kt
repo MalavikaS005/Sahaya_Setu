@@ -56,6 +56,7 @@ fun ReportDetailScreen(
     ) {
         // Title
         Text(
+            modifier=Modifier.padding(top=48.dp),
             text = report.title,
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold
@@ -169,7 +170,7 @@ fun ReportDetailScreen(
 
         // Department & Worker Info
         Card(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().padding(bottom = 46.dp),
             shape = RoundedCornerShape(12.dp),
             elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
             colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F5F5))

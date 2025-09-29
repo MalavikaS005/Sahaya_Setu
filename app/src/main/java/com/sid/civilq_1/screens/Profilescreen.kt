@@ -1,5 +1,7 @@
 package com.sid.civilq_1.screens
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -8,6 +10,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -16,27 +19,52 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions.DEFAULT_SIGN_IN
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 import com.sid.civilq_1.R
+
 
 @Composable
 fun ProfileScreen(navController: NavHostController) {
     val scrollState = rememberScrollState()
 
+    val context= LocalContext.current
     Column(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(scrollState)
     ) {
+
+       Button(
+           content={ Text("Logout", textAlign = TextAlign.Center) },
+           onClick = {
+               signout(context){
+                   Toast.makeText(context,"Logged Out",Toast.LENGTH_LONG).show()
+                   navController.navigate("login"){
+                       popUpTo("profile"){
+                           inclusive=true
+                       }
+                   }
+               }
+           },
+           modifier = Modifier
+               .padding(top = 36.dp, end = 16.dp)
+               .align(Alignment.End))
         // 🔹 Full-width profile image at the top
         Image(
             painter = painterResource(id = R.drawable.userproficon),
             contentDescription = "Profile Image",
             modifier = Modifier
                 .fillMaxWidth()
+                .padding(top = 2.dp)
                 .height(270.dp), // adjust height as needed
             contentScale = ContentScale.Crop
         )
@@ -48,7 +76,6 @@ fun ProfileScreen(navController: NavHostController) {
             fontWeight = FontWeight.Bold,
             color = Color(0xFF4CAF50), // green color
             modifier = Modifier
-
                 .padding(start = 46.dp, top = 4.dp) // align left with margin
         )
 
@@ -152,7 +179,6 @@ fun ProfileScreen(navController: NavHostController) {
         }
     }
 }
-
 @Composable
 fun ProfileDetailRow(icon: androidx.compose.ui.graphics.vector.ImageVector, info: String) {
     Row(
@@ -166,3 +192,16 @@ fun ProfileDetailRow(icon: androidx.compose.ui.graphics.vector.ImageVector, info
         Text(text = info, style = MaterialTheme.typography.bodyMedium)
     }
 }
+
+fun signout(context: Context,  onComplete:()->Unit) {
+    Firebase.auth.signOut()
+
+    val googleSignInOptions = GoogleSignInOptions.Builder( DEFAULT_SIGN_IN)
+        .requestIdToken("290279683385-81erbnvb3shb4op63rl26cc2vl5272tb.apps.googleusercontent.com")
+        .requestEmail()
+        .build()
+    val googleSignInClient =
+        com.google.android.gms.auth.api.signin.GoogleSignIn.getClient(context, googleSignInOptions)
+    googleSignInClient.signOut().addOnCompleteListener {
+        onComplete()
+    }}
